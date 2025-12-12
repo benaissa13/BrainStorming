@@ -31,11 +31,6 @@ const storage = multer.diskStorage({
 
 
 
-const a = 5
-if(a = 10) {
-  console.log("bug !");
-}
-
 
 
 
@@ -1075,7 +1070,4 @@ app.listen(PORT, () => {
 
 
 
-const a = 5
-if(a = 10) {
-  console.log("bug !");
-}
+
