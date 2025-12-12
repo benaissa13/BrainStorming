@@ -28,6 +28,12 @@ const storage = multer.diskStorage({
   }
 });
 
+
+
+
+
+
+
 // Types de fichiers autorisés
 const allowedMimeTypes = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp',
@@ -1065,8 +1071,3 @@ app.listen(PORT, () => {
 
 
 
-
-const a = 5
-if(a = 10) {
-  console.log("bug !");
-}
