@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Répertoire des Émojis - Administration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .search-section {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .search-input {
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            width: 300px;
+            font-size: 1rem;
+            margin-right: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .category-filter {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            margin: 0.25rem;
+            transition: all 0.3s;
+        }
+
+        .category-filter:hover,
+        .category-filter.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .categories-section {
+            margin-bottom: 2rem;
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+            text-transform: capitalize;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .emoji-card {
+            background: white;
+            border: 2px solid #f0f0f0;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emoji-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+        }
+
+        .emoji-card.copied {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+
+        .emoji-display {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .emoji-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .emoji-description {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.3;
+        }
+
+        .copy-feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .search-input {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 0.5rem;
+            }
+
+            .emoji-card {
+                padding: 0.75rem;
+            }
+
+            .emoji-display {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Répertoire des Émojis</h1>
+            <p>Cliquez sur un émoji pour le copier dans votre presse-papier</p>
+            <nav class="nav-links">
+                <a href="/dashboard.html">📋 Dashboard</a>
+                <a href="/admin-projects.html">📌 Projets</a>
+                <a href="/admin-types.html">🏷️ Types</a>
+                <a href="/admin-users.html">👥 Utilisateurs</a>
+            </nav>
+        </div>
+
+        <div class="content">
+            <!-- Section de recherche -->
+            <div class="search-section">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un émoji...">
+                <div id="categoryFilters"></div>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="stats" id="statsSection">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalEmojis">-</div>
+                        <div class="stat-label">Émojis Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalCategories">-</div>
+                        <div class="stat-label">Catégories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="copiedCount">0</div>
+                        <div class="stat-label">Copiés</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section des émojis -->
+            <div id="emojisContainer">
+                <div class="loading">Chargement des émojis...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allEmojis = [];
+        let allCategories = [];
+        let currentFilter = 'all';
+        let copiedCount = 0;
+
+        // Vérifier l'authentification
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/check');
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Erreur auth:', error);
+                window.location.href = '/login.html';
+                return false;
+            }
+        }
+
+        // Charger les catégories
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/emoji-categories');
+                if (response.ok) {
+                    allCategories = await response.json();
+                    displayCategoryFilters();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Erreur chargement catégories:', error);
+            }
+        }
+
+        // Charger les émojis
+        async function loadEmojis() {
+            try {
+                const response = await fetch('/api/emojis');
+                if (response.ok) {
+                    allEmojis = await response.json();
+                    displayEmojis();
+                    updateStats();
+                } else {
+                    document.getElementById('emojisContainer').innerHTML = 
+                        '<div class="loading">❌ Erreur de chargement des émojis</div>';
+                }
+            } catch (error) {
+                console.error('Erreur chargement émojis:', error);
+                document.getElementById('emojisContainer').innerHTML = 
+                    '<div class="loading">❌ Erreur de connexion</div>';
+            }
+        }
+
+        // Afficher les filtres de catégories
+        function displayCategoryFilters() {
+            const container = document.getElementById('categoryFilters');
+            
+            let filtersHTML = `
+                <button class="category-filter ${currentFilter === 'all' ? 'active' : ''}" 
+                        onclick="filterByCategory('all')">
+                    📚 Toutes (${allEmojis.length})
+                </button>
+            `;
+            
+            allCategories.forEach(category => {
+                filtersHTML += `
+                    <button class="category-filter ${currentFilter === category.category ? 'active' : ''}" 
+                            onclick="filterByCategory('${category.category}')">
+                        📁 ${category.category} (${category.count})
+                    </button>
+                `;
+            });
+            
+            container.innerHTML = filtersHTML;
+        }
+
+        // Filtrer par catégorie
+        function filterByCategory(category) {
+            currentFilter = category;
+            displayEmojis();
+            displayCategoryFilters();
+        }
+
+        // Afficher les émojis
+        function displayEmojis() {
+            const container = document.getElementById('emojisContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filteredEmojis = allEmojis;
+            
+            // Filtrer par catégorie
+            if (currentFilter !== 'all') {
+                filteredEmojis = filteredEmojis.filter(emoji => emoji.category === currentFilter);
+            }
+            
+            // Filtrer par recherche
+            if (searchTerm) {
+                filteredEmojis = filteredEmojis.filter(emoji => 
+                    emoji.name.toLowerCase().includes(searchTerm) ||
+                    emoji.description.toLowerCase().includes(searchTerm) ||
+                    emoji.category.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            if (filteredEmojis.length === 0) {
+                container.innerHTML = '<div class="loading">😔 Aucun émoji trouvé</div>';
+                return;
+            }
+            
+            // Grouper par catégorie
+            const groupedEmojis = {};
+            filteredEmojis.forEach(emoji => {
+                if (!groupedEmojis[emoji.category]) {
+                    groupedEmojis[emoji.category] = [];
+                }
+                groupedEmojis[emoji.category].push(emoji);
+            });
+            
+            let html = '';
+            Object.keys(groupedEmojis).sort().forEach(category => {
+                if (currentFilter === 'all') {
+                    html += `<h2 class="category-title">📁 ${category}</h2>`;
+                }
+                
+                html += '<div class="emoji-grid">';
+                groupedEmojis[category].forEach(emoji => {
+                    html += `
+                        <div class="emoji-card" onclick="copyEmoji('${emoji.emoji}', '${emoji.name}', this)">
+                            <span class="emoji-display">${emoji.emoji}</span>
+                            <div class="emoji-name">${emoji.name}</div>
+                            <div class="emoji-description">${emoji.description}</div>
+                            <div class="copy-feedback">Copié !</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Copier un émoji
+        async function copyEmoji(emoji, name, element) {
+            try {
+                await navigator.clipboard.writeText(emoji);
+                
+                // Animation de feedback
+                element.classList.add('copied');
+                const feedback = element.querySelector('.copy-feedback');
+                feedback.classList.add('show');
+                
+                // Incrémenter le compteur
+                copiedCount++;
+                document.getElementById('copiedCount').textContent = copiedCount;
+                
+                // Réinitialiser après 1 seconde
+                setTimeout(() => {
+                    element.classList.remove('copied');
+                    feedback.classList.remove('show');
+                }, 1000);
+                
+                console.log(`✅ Émoji copié: ${emoji} (${name})`);
+            } catch (error) {
+                console.error('Erreur copie:', error);
+                alert('❌ Erreur lors de la copie');
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats() {
+            document.getElementById('totalEmojis').textContent = allEmojis.length;
+            document.getElementById('totalCategories').textContent = allCategories.length;
+        }
+
+        // Recherche en temps réel
+        document.getElementById('searchInput').addEventListener('input', displayEmojis);
+
+        // Initialisation
+        checkAuth().then(isAuthenticated => {
+            if (isAuthenticated) {
+                loadCategories();
+                loadEmojis();
+            }
+        });
+    </script>
+</body>
+</html>

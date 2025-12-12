@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainstorming - Dashboard</title>
+    <!-- GLightbox CSS pour UX moderne -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .nav { display: flex; gap: 15px; }
+        .nav button { padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .nav button:hover { background: #5a6268; }
+        .form-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        textarea { height: 100px; resize: vertical; }
+        .btn-primary { background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary:hover { background: #0056b3; }
+        .ideas-grid { display: grid; gap: 20px; }
+        .idea-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+        .idea-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        .idea-title { font-size: 1.2em; font-weight: bold; margin: 0; }
+        .idea-meta { font-size: 0.9em; color: #666; }
+        .idea-description { margin: 15px 0; line-height: 1.5; }
+        .file-link { display: inline-block; margin-top: 10px; padding: 5px 10px; background: #e9ecef; border-radius: 4px; text-decoration: none; color: #495057; }
+        .file-link:hover { background: #dee2e6; }
+        .admin-section { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin-bottom: 30px; }
+        .hidden { display: none; }
+        .error { color: red; margin-top: 10px; }
+        .success { color: green; margin-top: 10px; }
+        .btn-danger { background: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; }
+        .btn-danger:hover { background: #c82333; }
+        .idea-actions { margin-top: 10px; }
+        .user-actions { margin-top: 5px; }
+        .admin-view-badge { background: #17a2b8; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8em; margin-left: 10px; }
+        .other-user-idea { border-left: 4px solid #17a2b8; }
+        .form-section h4 { color: #333; margin-bottom: 20px; }
+        .form-group label { color: #555; font-weight: 600; }
+        select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: white; }
+        .user-profile { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 5px 0; }
+        .user-profile div { margin: 3px 0; font-size: 0.9em; }
+        .author-link { color: #007bff; text-decoration: none; font-weight: 600; }
+        .author-link:hover { color: #0056b3; text-decoration: underline; cursor: pointer; }
+
+        /* Styles pour la grille d'images moderne (style Facebook) */
+        .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .gallery-grid a {
+            flex: 1 1 calc(20% - 4px);
+            max-width: calc(20% - 4px);
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .gallery-grid a:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .gallery-grid img:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Responsive pour mobile */
+        @media (max-width: 768px) {
+            .gallery-grid a {
+                flex: 1 1 calc(33.333% - 4px);
+                max-width: calc(33.333% - 4px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid a {
+                flex: 1 1 calc(50% - 4px);
+                max-width: calc(50% - 4px);
+            }
+        }
+
+        /* Style pour une seule image */
+        .single-image {
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .single-image:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .single-image img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            cursor: zoom-in;
+            transition: all 0.3s ease;
+        }
+
+        .single-image img:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Overlay pour plus d'images */
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-grid a:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        /* Styles pour le fil d'actualité professionnel */
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .publication-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .type-brainstorming { background: #6f42c1; }
+        .type-projet { background: #28a745; }
+        .type-intervention { background: #fd7e14; }
+        .type-annonce { background: #007bff; }
+        .type-question { background: #dc3545; }
+
+        .project-badge {
+            padding: 3px 8px;
+            border-radius: 8px;
+            background: #e9ecef;
+            color: #495057;
+            font-size: 0.8em;
+            border: 1px solid #dee2e6;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .btn-filter {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-filter:hover {
+            background: #0056b3;
+        }
+
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .btn-reset:hover {
+            background: #545b62;
+        }
+
+        /* Menu d'administration */
+        .admin-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .admin-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1000;
+        }
+
+        .admin-dropdown.show {
+            display: block;
+        }
+
+        .admin-dropdown a {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #495057;
+            text-decoration: none;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background 0.2s;
+        }
+
+        .admin-dropdown a:hover {
+            background: #f8f9fa;
+            color: #007bff;
+        }
+
+        .admin-dropdown a:last-child {
+            border-bottom: none;
+        }
+
+        .admin-menu-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .admin-menu-btn:hover {
+            background: #218838;
+        }
+
+        .admin-menu-btn::after {
+            content: '▼';
+            font-size: 0.8em;
+        }
+
+        /* Boutons de vue */
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-sm.active {
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.5);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 Brainstorming</h1>
+        <div class="nav">
+            <span id="welcomeText"></span>
+            <button id="adminBtn" class="hidden">Admin</button>
+            <div class="admin-menu hidden" id="adminMenu">
+                <button class="admin-menu-btn" onclick="toggleAdminMenu()">
+                    🔧 Administration
+                </button>
+                <div class="admin-dropdown" id="adminDropdown">
+                    <a href="/admin-projects.html">📌 Gestion des Projets</a>
+                    <a href="/admin-types.html">🏷️ Types de Publications</a>
+                    <a href="/admin-users.html">👥 Gestion des Utilisateurs</a>
+                    <a href="/admin-emojis.html">📚 Répertoire d'Émojis</a>
+                </div>
+            </div>
+            <button id="logoutBtn">Déconnexion</button>
+        </div>
+    </div>
+
+    <!-- Section Admin -->
+    <div id="adminSection" class="admin-section hidden">
+        <h3>🔧 Administration</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h4>Créer un utilisateur</h4>
+                <form id="createUserForm">
+                    <!-- Informations de connexion -->
+                    <div class="form-group">
+                        <label for="newUsername">Nom d'utilisateur *</label>
+                        <input type="text" id="newUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Mot de passe *</label>
+                        <input type="password" id="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Ex: utilisateur@exemple.com">
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="isAdmin"> Administrateur</label>
+                    </div>
+
+                    <!-- Informations personnelles -->
+                    <div class="form-group">
+                        <label for="nom">Nom complet</label>
+                        <input type="text" id="nom" placeholder="Ex: Ahmed Bensalah">
+                    </div>
+                    <div class="form-group">
+                        <label for="adresse">Adresse</label>
+                        <input type="text" id="adresse" placeholder="Ex: 12 Rue des Oliviers, Alger">
+                    </div>
+                    <div class="form-group">
+                        <label for="telephone">Téléphone</label>
+                        <input type="tel" id="telephone" placeholder="Ex: +213661234567">
+                    </div>
+                    <div class="form-group">
+                        <label for="date_naissance">Date de naissance</label>
+                        <input type="date" id="date_naissance">
+                    </div>
+                    <div class="form-group">
+                        <label for="sexe">Sexe</label>
+                        <select id="sexe">
+                            <option value="">Sélectionner...</option>
+                            <option value="Homme">Homme</option>
+                            <option value="Femme">Femme</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <!-- Informations professionnelles -->
+                    <div class="form-group">
+                        <label for="fonction">Fonction</label>
+                        <input type="text" id="fonction" placeholder="Ex: Ingénieur R&D">
+                    </div>
+                    <div class="form-group">
+                        <label for="projet">Projet</label>
+                        <input type="text" id="projet" placeholder="Ex: Automatisation 2025">
+                    </div>
+                    <div class="form-group">
+                        <label for="diplome">Diplôme</label>
+                        <input type="text" id="diplome" placeholder="Ex: Master en informatique">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Créer l'utilisateur</button>
+                </form>
+                <div id="createUserMessage"></div>
+            </div>
+            <div>
+                <h4>Utilisateurs</h4>
+                <div id="usersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section de filtrage pour les administrateurs -->
+    <div id="filterSection" class="filter-section" style="display: none;">
+        <h3>🔍 Filtrer les publications</h3>
+        <form id="filterForm">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="filterType">Type</label>
+                    <select id="filterType" name="type">
+                        <option value="">Tous les types</option>
+                        <!-- Options chargées dynamiquement -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterProject">Projet</label>
+                    <select id="filterProject" name="project_id">
+                        <option value="">Tous les projets</option>
+                        <!-- Options chargées dynamiquement -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterFrom">Du</label>
+                    <input type="date" id="filterFrom" name="from">
+                </div>
+                <div class="filter-group">
+                    <label for="filterTo">Au</label>
+                    <input type="date" id="filterTo" name="to">
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="btn-filter">Filtrer</button>
+                    <button type="button" class="btn-reset" onclick="resetFilters()">Reset</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Formulaire nouvelle publication -->
+    <div class="form-section">
+        <h2>📋 Nouvelle publication</h2>
+        <form id="ideaForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Titre *</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" placeholder="Décrivez votre publication..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="flex: 1; margin-right: 10px;">
+                    <label for="type_id">🏷️ Type de publication *</label>
+                    <select id="type_id" name="type_id" required>
+                        <option value="">Chargement...</option>
+                        <!-- Options chargées dynamiquement -->
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="project_id">📋 Projet associé (optionnel)</label>
+                    <select id="project_id" name="project_id">
+                        <option value="">Aucun projet</option>
+                        <!-- Options chargées dynamiquement -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="file">📎 Fichier joint (optionnel)</label>
+                <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.txt,.csv,.xls,.xlsx,.ppt,.pptx">
+                <small>Fichiers autorisés: PDF, Word, Excel, PowerPoint, TXT, CSV</small>
+            </div>
+            <div class="form-group">
+                <label for="images">🖼️ Images (optionnelles - max 5)</label>
+                <input type="file" id="images" name="images" accept="image/*" multiple>
+                <small>Images autorisées: JPG, PNG, GIF, WebP (max 5 images)</small>
+                <div id="imagesPreview" style="margin-top: 10px; display: none;">
+                    <div id="previewContainer" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary">Publier</button>
+        </form>
+        <div id="ideaMessage"></div>
+    </div>
+
+    <!-- Fil d'actualité -->
+    <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 id="ideasTitle">📋 Fil d'actualité</h2>
+            <div id="viewToggle" class="hidden">
+                <button id="viewMyIdeas" class="btn btn-secondary btn-sm">📋 Mes idées</button>
+                <button id="viewAdminPosts" class="btn btn-primary btn-sm">📢 Publications Admin</button>
+                <button id="viewAllIdeas" class="btn btn-success btn-sm">🌐 Toutes les idées</button>
+            </div>
+        </div>
+        <div id="ideasContainer" class="ideas-grid"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        // Vérifier l'authentification
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/status');
+
+                if (!response.ok) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                const data = await response.json();
+                currentUser = data;
+                document.getElementById('welcomeText').textContent = `Bonjour ${data.username}`;
+
+                if (data.isAdmin) {
+                    console.log('👑 Utilisateur admin détecté - Affichage du menu d\'administration');
+                    document.getElementById('adminBtn').classList.remove('hidden');
+                    document.getElementById('adminMenu').classList.remove('hidden');
+                    document.getElementById('ideasTitle').innerHTML = '📋 Toutes les idées (Vue Admin)';
+                } else {
+                    console.log('👤 Utilisateur normal - Menu d\'administration masqué');
+                    document.getElementById('adminBtn').classList.add('hidden');
+                    document.getElementById('adminMenu').classList.add('hidden');
+                    document.getElementById('viewToggle').classList.remove('hidden');
+                    document.getElementById('ideasTitle').innerHTML = '📋 Mes idées';
+
+                    // Activer le bouton "Mes idées" par défaut
+                    document.getElementById('viewMyIdeas').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Erreur vérification auth:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Déconnexion
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+
+        // Toggle admin section
+        document.getElementById('adminBtn').addEventListener('click', () => {
+            const section = document.getElementById('adminSection');
+            section.classList.toggle('hidden');
+            if (!section.classList.contains('hidden')) {
+                loadUsers();
+            }
+        });
+
+        // Créer utilisateur (admin)
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                username: document.getElementById('newUsername').value,
+                password: document.getElementById('newPassword').value,
+                email: document.getElementById('email').value || null,
+                isAdmin: document.getElementById('isAdmin').checked,
+                nom: document.getElementById('nom').value || null,
+                adresse: document.getElementById('adresse').value || null,
+                telephone: document.getElementById('telephone').value || null,
+                date_naissance: document.getElementById('date_naissance').value || null,
+                sexe: document.getElementById('sexe').value || null,
+                fonction: document.getElementById('fonction').value || null,
+                projet: document.getElementById('projet').value || null,
+                diplome: document.getElementById('diplome').value || null
+            };
+
+            const messageDiv = document.getElementById('createUserMessage');
+
+            try {
+                const response = await fetch('/api/admin/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success">Utilisateur créé avec succès avec profil complet</div>';
+                    document.getElementById('createUserForm').reset();
+                    loadUsers();
+                } else {
+                    if (data.details) {
+                        const errors = data.details.map(err => err.msg).join(', ');
+                        messageDiv.innerHTML = '<div class="error">Erreurs: ' + errors + '</div>';
+                    } else {
+                        messageDiv.innerHTML = '<div class="error">' + data.error + '</div>';
+                    }
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">Erreur lors de la création</div>';
+            }
+        });
+
+        // Charger la liste des utilisateurs
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const users = await response.json();
+
+                const container = document.getElementById('usersList');
+                container.innerHTML = users.map(user => `
+                    <div style="padding: 15px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 8px; background: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <div>
+                                <strong style="font-size: 1.1em;">${user.username}</strong>
+                                ${user.is_admin ? '<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.8em;">Admin</span>' : '<span style="background: #6c757d; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.8em;">Utilisateur</span>'}
+                            </div>
+                            <small style="color: #666;">Créé le: ${new Date(user.created_at).toLocaleDateString()}</small>
+                        </div>
+
+                        ${user.nom ? `<div><strong>Nom:</strong> ${user.nom}</div>` : ''}
+                        ${user.email ? `<div><strong>Email:</strong> ${user.email}</div>` : ''}
+                        ${user.fonction ? `<div><strong>Fonction:</strong> ${user.fonction}</div>` : ''}
+                        ${user.projet ? `<div><strong>Projet:</strong> ${user.projet}</div>` : ''}
+                        ${user.adresse ? `<div><strong>Adresse:</strong> ${user.adresse}</div>` : ''}
+                        ${user.telephone ? `<div><strong>Téléphone:</strong> ${user.telephone}</div>` : ''}
+                        ${user.date_naissance ? `<div><strong>Date de naissance:</strong> ${new Date(user.date_naissance).toLocaleDateString()}</div>` : ''}
+                        ${user.sexe ? `<div><strong>Sexe:</strong> ${user.sexe}</div>` : ''}
+                        ${user.diplome ? `<div><strong>Diplôme:</strong> ${user.diplome}</div>` : ''}
+
+                        ${user.username !== currentUser.username ? `
+                            <div class="user-actions" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                                <button class="btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">Supprimer</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur chargement utilisateurs:', error);
+            }
+        }
+
+        // Publier une idée
+        document.getElementById('ideaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('type_id', document.getElementById('type_id').value);
+            formData.append('project_id', document.getElementById('project_id').value);
+
+            const fileInput = document.getElementById('file');
+            if (fileInput.files[0]) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            const imagesInput = document.getElementById('images');
+            if (imagesInput.files.length > 0) {
+                for (let i = 0; i < imagesInput.files.length; i++) {
+                    formData.append('images', imagesInput.files[i]);
+                }
+            }
+            
+            const messageDiv = document.getElementById('ideaMessage');
+            
+            try {
+                const response = await fetch('/api/ideas', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success">Idée publiée avec succès !</div>';
+                    document.getElementById('ideaForm').reset();
+                    loadIdeas();
+                } else {
+                    messageDiv.innerHTML = '<div class="error">' + data.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">Erreur lors de la publication</div>';
+            }
+        });
+
+        // Fonction pour charger les projets
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                if (response.ok) {
+                    const projects = await response.json();
+
+                    // Remplir le select de création
+                    const projectSelect = document.getElementById('project_id');
+                    projectSelect.innerHTML = '<option value="">Aucun projet</option>';
+
+                    // Remplir le select de filtrage
+                    const filterProjectSelect = document.getElementById('filterProject');
+                    filterProjectSelect.innerHTML = '<option value="">Tous les projets</option>';
+
+                    projects.forEach(project => {
+                        const option1 = new Option(project.name, project.id);
+                        const option2 = new Option(project.name, project.id);
+                        projectSelect.appendChild(option1);
+                        filterProjectSelect.appendChild(option2);
+                    });
+
+                    console.log(`✅ ${projects.length} projet(s) chargé(s)`);
+                } else {
+                    console.log('❌ Erreur chargement projets');
+                }
+            } catch (error) {
+                console.log('❌ Erreur:', error);
+            }
+        }
+
+        // Fonction pour charger les types de publications
+        async function loadPublicationTypes() {
+            try {
+                const response = await fetch('/api/publication-types');
+                if (response.ok) {
+                    const types = await response.json();
+
+                    // Remplir le select de création
+                    const typeSelect = document.getElementById('type_id');
+                    typeSelect.innerHTML = '<option value="">Choisir un type</option>';
+
+                    // Remplir le select de filtrage
+                    const filterTypeSelect = document.getElementById('filterType');
+                    filterTypeSelect.innerHTML = '<option value="">Tous les types</option>';
+
+                    types.forEach(type => {
+                        const option1 = new Option(`${type.emoji} ${type.name}`, type.id);
+                        const option2 = new Option(`${type.emoji} ${type.name}`, type.name);
+                        typeSelect.appendChild(option1);
+                        filterTypeSelect.appendChild(option2);
+                    });
+
+                    console.log(`✅ ${types.length} type(s) de publication chargé(s)`);
+                } else {
+                    console.log('❌ Erreur chargement types');
+                }
+            } catch (error) {
+                console.log('❌ Erreur:', error);
+            }
+        }
+
+        // Charger les idées avec filtrage
+        async function loadIdeas(filters = {}) {
+            try {
+                // Construire l'URL avec les filtres
+                const params = new URLSearchParams();
+                Object.keys(filters).forEach(key => {
+                    if (filters[key]) {
+                        params.append(key, filters[key]);
+                    }
+                });
+
+                const url = '/api/ideas' + (params.toString() ? '?' + params.toString() : '');
+                const response = await fetch(url);
+                const ideas = await response.json();
+
+                const container = document.getElementById('ideasContainer');
+                container.innerHTML = ideas.map(idea => {
+                    const isOwnIdea = idea.username === currentUser.username;
+                    const isAdmin = currentUser.isAdmin;
+                    const cardClass = isAdmin && !isOwnIdea ? 'idea-card other-user-idea' : 'idea-card';
+
+                    // Nom d'affichage (nom complet ou username)
+                    const displayName = idea.nom || idea.username;
+
+                    // Lien vers le profil (seulement pour les admins et si ce n'est pas sa propre idée)
+                    const authorDisplay = (isAdmin && !isOwnIdea)
+                        ? `<a href="/user-profile.html?id=${idea.author_id}" class="author-link" target="_blank">${displayName}</a>`
+                        : displayName;
+
+                    // Utiliser les informations de type depuis la base de données
+                    const typeInfo = {
+                        emoji: idea.type_emoji || '📝',
+                        label: idea.type_name || 'brainstorming',
+                        color: idea.type_color || '#6c757d'
+                    };
+
+                    return `
+                        <div class="${cardClass}">
+                            <div class="publication-meta">
+                                <span class="type-badge" style="background-color: ${typeInfo.color}; color: white;">
+                                    ${typeInfo.emoji} ${typeInfo.label}
+                                </span>
+                                ${idea.project_name ? `<span class="project-badge">📋 ${idea.project_name}</span>` : ''}
+                                <span style="margin-left: auto; color: #6c757d; font-size: 0.8em;">
+                                    ${new Date(idea.created_at).toLocaleDateString('fr-FR')}
+                                </span>
+                            </div>
+                            <div class="idea-header">
+                                <h3 class="idea-title">
+                                    ${idea.title}
+                                    ${isAdmin && !isOwnIdea ? '<span class="admin-view-badge">Autre utilisateur</span>' : ''}
+                                </h3>
+                                <div class="idea-meta">
+                                    Par ${authorDisplay}<br>
+                                    ${new Date(idea.created_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                            ${idea.description ? `<div class="idea-description">${idea.description}</div>` : ''}
+                            ${createImageGallery(idea.images, idea.id)}
+                            ${idea.filename ? `<a href="/api/files/${idea.filename}" target="_blank" class="file-link">📎 ${idea.original_filename || 'Fichier joint'}</a>` : ''}
+                            ${(isOwnIdea || isAdmin) ? `
+                                <div class="idea-actions">
+                                    <button class="btn-danger" onclick="deleteIdea(${idea.id}, '${idea.title}')">
+                                        ${isOwnIdea ? 'Supprimer' : 'Supprimer (Admin)'}
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Erreur chargement idées:', error);
+            }
+        }
+
+        // Supprimer une idée
+        async function deleteIdea(ideaId, title) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer l'idée "${title}" ?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/ideas/${ideaId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadIdeas(); // Recharger la liste
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            } catch (error) {
+                alert('Erreur lors de la suppression');
+            }
+        }
+
+        // Supprimer un utilisateur
+        async function deleteUser(userId, username) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur "${username}" ? Toutes ses idées seront également supprimées.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadUsers(); // Recharger la liste
+                    loadIdeas(); // Recharger les idées aussi
+                } else {
+                    alert('Erreur: ' + data.error);
+                }
+            } catch (error) {
+                alert('Erreur lors de la suppression');
+            }
+        }
+
+        // Aperçu des images multiples
+        document.getElementById('images').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const preview = document.getElementById('imagesPreview');
+            const container = document.getElementById('previewContainer');
+
+            // Vider le conteneur
+            container.innerHTML = '';
+
+            if (files.length > 0) {
+                if (files.length > 5) {
+                    alert('Maximum 5 images autorisées');
+                    e.target.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+
+                Array.from(files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imgDiv = document.createElement('div');
+                        imgDiv.style.cssText = 'position: relative; display: inline-block;';
+                        imgDiv.innerHTML = `
+                            <img src="${e.target.result}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                            <div style="position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;" onclick="removePreviewImage(${index})">&times;</div>
+                        `;
+                        container.appendChild(imgDiv);
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // Fonction pour supprimer une image de l'aperçu
+        function removePreviewImage(index) {
+            const input = document.getElementById('images');
+            const dt = new DataTransfer();
+            const files = Array.from(input.files);
+
+            files.splice(index, 1);
+            files.forEach(file => dt.items.add(file));
+
+            input.files = dt.files;
+            input.dispatchEvent(new Event('change'));
+        }
+
+        // Fonction pour créer une grille d'images moderne avec GLightbox
+        function createImageGallery(images, ideaId) {
+            if (!images || images.length === 0) {
+                return '';
+            }
+
+            // Groupe unique pour chaque idée pour navigation GLightbox
+            const galleryGroup = `idea-${ideaId}`;
+
+            if (images.length === 1) {
+                // Une seule image, affichage simple avec GLightbox
+                return `
+                    <div class="single-image">
+                        <a href="/api/files/${images[0].filename}"
+                           class="glightbox"
+                           data-gallery="${galleryGroup}"
+                           data-title="${images[0].original_filename || 'Image'}">
+                            <img src="/api/files/${images[0].filename}"
+                                 alt="${images[0].original_filename || 'Image'}"
+                                 loading="lazy">
+                        </a>
+                    </div>
+                `;
+            }
+
+            // Plusieurs images, grille avec GLightbox
+            const maxVisible = 5; // Maximum 5 images visibles
+            const visibleImages = images.slice(0, maxVisible);
+            const remainingCount = images.length - maxVisible;
+
+            return `
+                <div class="gallery-grid">
+                    ${images.map((image, index) => {
+                        const isVisible = index < maxVisible;
+                        const isLast = index === maxVisible - 1 && remainingCount > 0;
+
+                        return `
+                            <a href="/api/files/${image.filename}"
+                               class="glightbox"
+                               data-gallery="${galleryGroup}"
+                               data-title="${image.original_filename || `Image ${index + 1}`}"
+                               ${!isVisible ? 'style="display: none;"' : ''}>
+                                ${isVisible ? `
+                                    <img src="/api/files/${image.filename}"
+                                         alt="${image.original_filename || `Image ${index + 1}`}"
+                                         loading="lazy">
+                                    ${isLast ? `<div class="gallery-overlay">+${remainingCount}</div>` : ''}
+                                ` : ''}
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+
+        // Fonction pour initialiser GLightbox avec configuration française
+        function initGLightbox() {
+            if (typeof GLightbox !== 'undefined') {
+                const lightbox = GLightbox({
+                    // Navigation et contrôles
+                    touchNavigation: true,
+                    loop: true,
+                    closeButton: true,
+                    keyboardNavigation: true,
+
+                    // Animations et performance
+                    openEffect: 'zoom',
+                    closeEffect: 'zoom',
+                    slideEffect: 'slide',
+                    moreText: 'Voir plus',
+                    moreLength: 60,
+
+                    // Responsive et mobile
+                    dragToleranceX: 40,
+                    dragToleranceY: 65,
+
+                    // Styles et apparence
+                    skin: 'clean',
+                    cssEfects: {
+                        fade: { in: 'fadeIn', out: 'fadeOut' },
+                        zoom: { in: 'zoomIn', out: 'zoomOut' }
+                    },
+
+                    // Callbacks pour debug
+                    onOpen: () => {
+                        console.log('🖼️ GLightbox ouvert');
+                    },
+                    onClose: () => {
+                        console.log('❌ GLightbox fermé');
+                    }
+                });
+                console.log('✅ GLightbox initialisé avec configuration française');
+                return lightbox;
+            } else {
+                console.log('⚠️ GLightbox non disponible, retry dans 100ms');
+                setTimeout(initGLightbox, 100);
+            }
+        }
+
+        // Fonction pour gérer le filtrage
+        document.getElementById('filterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const filters = {};
+
+            for (let [key, value] of formData.entries()) {
+                if (value.trim()) {
+                    filters[key] = value.trim();
+                }
+            }
+
+            console.log('🔍 Filtres appliqués:', filters);
+            loadIdeas(filters).then(() => {
+                setTimeout(initGLightbox, 200);
+            });
+        });
+
+        // Fonction pour réinitialiser les filtres
+        function resetFilters() {
+            document.getElementById('filterForm').reset();
+            loadIdeas().then(() => {
+                setTimeout(initGLightbox, 200);
+            });
+        }
+
+        // Fonction pour afficher/masquer la section de filtrage selon le rôle
+        function toggleFilterSection() {
+            const filterSection = document.getElementById('filterSection');
+            if (currentUser && currentUser.isAdmin) {
+                filterSection.style.display = 'block';
+            } else {
+                filterSection.style.display = 'none';
+            }
+        }
+
+        // Fonction pour basculer le menu d'administration
+        function toggleAdminMenu() {
+            const dropdown = document.getElementById('adminDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Fermer le menu si on clique ailleurs
+        document.addEventListener('click', function(event) {
+            const adminMenu = document.getElementById('adminMenu');
+            const dropdown = document.getElementById('adminDropdown');
+
+            if (adminMenu && !adminMenu.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Gestion des boutons de vue pour les utilisateurs normaux
+        function setupViewToggle() {
+            document.getElementById('viewMyIdeas').addEventListener('click', () => {
+                setActiveViewButton('viewMyIdeas');
+                document.getElementById('ideasTitle').innerHTML = '📋 Mes idées';
+                loadIdeas({ user_only: true });
+            });
+
+            document.getElementById('viewAdminPosts').addEventListener('click', () => {
+                setActiveViewButton('viewAdminPosts');
+                document.getElementById('ideasTitle').innerHTML = '📢 Publications des Administrateurs';
+                loadIdeas({ admin_only: true });
+            });
+
+            document.getElementById('viewAllIdeas').addEventListener('click', () => {
+                setActiveViewButton('viewAllIdeas');
+                document.getElementById('ideasTitle').innerHTML = '🌐 Toutes les idées';
+                loadIdeas();
+            });
+        }
+
+        function setActiveViewButton(activeId) {
+            ['viewMyIdeas', 'viewAdminPosts', 'viewAllIdeas'].forEach(id => {
+                document.getElementById(id).classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+
+        // Initialisation
+        checkAuth().then(() => {
+            toggleFilterSection();
+            loadProjects();
+            loadPublicationTypes();
+            setupViewToggle();
+
+            // Charger les idées selon le type d'utilisateur
+            if (currentUser && currentUser.isAdmin) {
+                loadIdeas().then(() => {
+                    setTimeout(initGLightbox, 200);
+                });
+            } else {
+                // Pour les utilisateurs normaux, charger leurs idées par défaut
+                loadIdeas({ user_only: true }).then(() => {
+                    setTimeout(initGLightbox, 200);
+                });
+            }
+        });
+    </script>
+
+    <!-- GLightbox JS pour UX moderne -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+</body>
+</html>

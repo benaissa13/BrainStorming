@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Projets</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
+        
+        .header {
+            background: #343a40;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: #495057;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .project-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .project-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .project-details {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .meta-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .fiche-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #007bff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .fiche-link:hover {
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+        }
+
+        .algerian-flag {
+            font-size: 1.2em;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .project-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1> Administration - Projets </h1>
+        <nav class="nav-links">
+            <a href="/dashboard.html">📋 Dashboard</a>
+            <a href="/admin-projects.html" class="active">📌 Projets</a>
+            <a href="/admin-types.html">🏷️ Types</a>
+            <a href="/admin-users.html">👥 Utilisateurs</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div id="alertContainer"></div>
+        
+        <!-- Formulaire d'ajout de projet algérien -->
+        <div class="admin-section">
+            <h2>🇩🇿 Ajouter un nouveau projet algérien</h2>
+            <form id="projectForm" enctype="multipart/form-data">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Nom du projet *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Statut</label>
+                        <select id="status" name="status">
+                            <option value="active">🟢 Actif</option>
+                            <option value="inactive">🔴 Inactif</option>
+                            <option value="completed">✅ Terminé</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="intitule">Intitulé du projet</label>
+                    <input type="text" id="intitule" name="intitule" placeholder="Intitulé détaillé du projet...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maitre_ouvrage">Maître d'ouvrage</label>
+                        <input type="text" id="maitre_ouvrage" name="maitre_ouvrage" placeholder="Organisme ou entreprise...">
+                    </div>
+                    <div class="form-group">
+                        <label for="localite">Localité</label>
+                        <input type="text" id="localite" name="localite" placeholder="Ville, Wilaya...">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date_ods">Date ODS (Ordre de Service)</label>
+                        <input type="date" id="date_ods" name="date_ods">
+                    </div>
+                    <div class="form-group">
+                        <label for="delai">Délai (en mois)</label>
+                        <input type="number" id="delai" name="delai" min="1" max="120" placeholder="Durée en mois">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fiche_signalitique">📄 Fiche signalétique (PDF ou Image)</label>
+                    <input type="file" id="fiche_signalitique" name="fiche_signalitique" accept=".pdf,.jpg,.jpeg,.png">
+                    <small>Formats acceptés: PDF, JPG, PNG (max 15MB)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="avances">Avances financières</label>
+                    <input type="text" id="avances" name="avances" placeholder="Ex: 30% à la signature, 20% au démarrage...">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description générale</label>
+                    <textarea id="description" name="description" placeholder="Description détaillée du projet..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="observation">Observations</label>
+                    <textarea id="observation" name="observation" placeholder="Remarques, contraintes, spécificités..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">🇩🇿 Créer le projet algérien</button>
+            </form>
+        </div>
+
+        <!-- Liste des projets -->
+        <div class="admin-section">
+            <h2>📋 Projets existants</h2>
+            <div id="loadingProjects" class="loading">Chargement des projets...</div>
+            <div id="projectsContainer" class="projects-grid" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let projects = [];
+
+        // Vérifier l'authentification et les droits admin
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/check');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    if (!currentUser.isAdmin) {
+                        window.location.href = '/dashboard.html';
+                        return;
+                    }
+                } else {
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Erreur vérification auth:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Afficher une alerte
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Charger les projets
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/admin/projects');
+                if (response.ok) {
+                    projects = await response.json();
+                    displayProjects();
+                } else {
+                    showAlert('Erreur lors du chargement des projets', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('Erreur de connexion', 'error');
+            } finally {
+                document.getElementById('loadingProjects').style.display = 'none';
+                document.getElementById('projectsContainer').style.display = 'grid';
+            }
+        }
+
+        // Afficher les projets algériens
+        function displayProjects() {
+            const container = document.getElementById('projectsContainer');
+
+            if (projects.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; grid-column: 1/-1;">Aucun projet trouvé</p>';
+                return;
+            }
+
+            container.innerHTML = projects.map(project => `
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-title">
+                            <span class="algerian-flag">🇩🇿</span>${project.name}
+                        </div>
+                        <span class="status-badge status-${project.status}">
+                            ${project.status === 'active' ? '🟢 Actif' :
+                              project.status === 'completed' ? '✅ Terminé' : '🔴 Inactif'}
+                        </span>
+                    </div>
+
+                    ${project.intitule ? `
+                        <div class="project-details">
+                            <strong>Intitulé:</strong> ${project.intitule}
+                        </div>
+                    ` : ''}
+
+                    <div class="project-meta">
+                        ${project.maitre_ouvrage ? `
+                            <div class="meta-item">
+                                <div class="meta-label">🏢 Maître d'ouvrage</div>
+                                <div class="meta-value">${project.maitre_ouvrage}</div>
+                            </div>
+                        ` : ''}
+
+                        ${project.localite ? `
+                            <div class="meta-item">
+                                <div class="meta-label">📍 Localité</div>
+                                <div class="meta-value">${project.localite}</div>
+                            </div>
+                        ` : ''}
+
+                        ${project.date_ods ? `
+                            <div class="meta-item">
+                                <div class="meta-label">📅 Date ODS</div>
+                                <div class="meta-value">${new Date(project.date_ods).toLocaleDateString('fr-FR')}</div>
+                            </div>
+                        ` : ''}
+
+                        ${project.delai ? `
+                            <div class="meta-item">
+                                <div class="meta-label">⏱️ Délai</div>
+                                <div class="meta-value">${project.delai} mois</div>
+                            </div>
+                        ` : ''}
+
+                        ${project.avances ? `
+                            <div class="meta-item">
+                                <div class="meta-label">💰 Avances</div>
+                                <div class="meta-value">${project.avances}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    ${project.description ? `
+                        <p style="color: #6c757d; margin: 1rem 0; font-style: italic;">
+                            ${project.description}
+                        </p>
+                    ` : ''}
+
+                    ${project.observation ? `
+                        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 0.75rem; border-radius: 4px; margin: 1rem 0;">
+                            <strong>📝 Observations:</strong> ${project.observation}
+                        </div>
+                    ` : ''}
+
+                    ${project.fiche_signalitique ? `
+                        <div style="margin: 1rem 0;">
+                            <a href="/uploads/${project.fiche_signalitique}" target="_blank" class="fiche-link">
+                                📄 Voir la fiche signalétique
+                            </a>
+                        </div>
+                    ` : ''}
+
+                    <div style="font-size: 0.9em; color: #6c757d; margin: 1rem 0;">
+                        Créé le ${new Date(project.created_at).toLocaleDateString('fr-FR')}
+                    </div>
+
+                    <div class="project-actions">
+                        <button class="btn btn-success btn-sm" onclick="editProject(${project.id})">
+                            ✏️ Modifier
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProject(${project.id}, '${project.name}')">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Ajouter un projet algérien
+        document.getElementById('projectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+
+            // Validation côté client
+            const name = formData.get('name');
+            if (!name || name.trim().length < 2) {
+                showAlert('Le nom du projet doit faire au moins 2 caractères', 'error');
+                return;
+            }
+
+            const delai = formData.get('delai');
+            if (delai && (delai < 1 || delai > 120)) {
+                showAlert('Le délai doit être entre 1 et 120 mois', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/projects', {
+                    method: 'POST',
+                    body: formData // Envoyer FormData directement pour gérer les fichiers
+                });
+
+                if (response.ok) {
+                    showAlert('Projet algérien ajouté avec succès');
+                    e.target.reset();
+                    loadProjects();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Erreur lors de l\'ajout', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('Erreur de connexion', 'error');
+            }
+        });
+
+        // Modifier un projet algérien (interface simplifiée)
+        function editProject(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+
+            // Créer un formulaire modal simple pour l'édition
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5); display: flex; align-items: center;
+                justify-content: center; z-index: 1000;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <h3>🇩🇿 Modifier le projet: ${project.name}</h3>
+                    <form id="editForm" enctype="multipart/form-data">
+                        <div style="margin-bottom: 1rem;">
+                            <label>Nom du projet *</label>
+                            <input type="text" name="name" value="${project.name}" required style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Intitulé</label>
+                            <input type="text" name="intitule" value="${project.intitule || ''}" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Maître d'ouvrage</label>
+                            <input type="text" name="maitre_ouvrage" value="${project.maitre_ouvrage || ''}" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Localité</label>
+                            <input type="text" name="localite" value="${project.localite || ''}" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                            <div>
+                                <label>Date ODS</label>
+                                <input type="date" name="date_ods" value="${project.date_ods || ''}" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                            <div>
+                                <label>Délai (mois)</label>
+                                <input type="number" name="delai" value="${project.delai || ''}" min="1" max="120" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Nouvelle fiche signalétique (optionnel)</label>
+                            <input type="file" name="fiche_signalitique" accept=".pdf,.jpg,.jpeg,.png" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            ${project.fiche_signalitique ? `<small>Fichier actuel: <a href="/uploads/${project.fiche_signalitique}" target="_blank">Voir</a></small>` : ''}
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Avances financières</label>
+                            <input type="text" name="avances" value="${project.avances || ''}" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Description</label>
+                            <textarea name="description" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; height: 80px;">${project.description || ''}</textarea>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Observations</label>
+                            <textarea name="observation" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem; height: 80px;">${project.observation || ''}</textarea>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label>Statut</label>
+                            <select name="status" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                                <option value="active" ${project.status === 'active' ? 'selected' : ''}>🟢 Actif</option>
+                                <option value="inactive" ${project.status === 'inactive' ? 'selected' : ''}>🔴 Inactif</option>
+                                <option value="completed" ${project.status === 'completed' ? 'selected' : ''}>✅ Terminé</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" onclick="this.closest('.modal').remove()" style="padding: 0.5rem 1rem; background: #6c757d; color: white; border: none; border-radius: 4px;">Annuler</button>
+                            <button type="submit" style="padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 4px;">Sauvegarder</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+
+            // Gérer la soumission du formulaire d'édition
+            modal.querySelector('#editForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                try {
+                    const response = await fetch(`/api/admin/projects/${projectId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        showAlert('Projet modifié avec succès');
+                        modal.remove();
+                        loadProjects();
+                    } else {
+                        const error = await response.json();
+                        showAlert(error.error || 'Erreur lors de la modification', 'error');
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    showAlert('Erreur de connexion', 'error');
+                }
+            });
+        }
+
+
+
+        // Supprimer un projet
+        async function deleteProject(projectId, projectName) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le projet "${projectName}" ?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/projects/${projectId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('Projet supprimé avec succès');
+                    loadProjects();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Erreur lors de la suppression', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('Erreur de connexion', 'error');
+            }
+        }
+
+        // Initialisation
+        checkAuth().then(() => {
+            loadProjects();
+        });
+    </script>
+</body>
+</html>

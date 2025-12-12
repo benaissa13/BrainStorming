@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Utilisateur - Brainstorming</title>
+    <!-- GLightbox CSS pour UX moderne -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+        }
+        
+        .profile-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        
+        .profile-info h1 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 28px;
+        }
+        
+        .profile-info .username {
+            color: #6c757d;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .role-admin {
+            background: #28a745;
+            color: white;
+        }
+        
+        .role-user {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .profile-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .section h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .field {
+            margin-bottom: 12px;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 4px;
+        }
+        
+        .field-value {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .ideas-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .idea-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .idea-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .idea-description {
+            color: #6c757d;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .idea-meta {
+            font-size: 12px;
+            color: #adb5bd;
+        }
+        
+        .file-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #495057;
+            font-size: 12px;
+        }
+        
+        .file-link:hover {
+            background: #dee2e6;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #6c757d;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        /* Styles pour la grille d'images moderne (style Facebook) */
+        .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin: 10px 0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .gallery-grid a {
+            flex: 1 1 calc(20% - 3px);
+            max-width: calc(20% - 3px);
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .gallery-grid a:hover {
+            transform: scale(1.02);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .gallery-grid img:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Responsive pour mobile */
+        @media (max-width: 768px) {
+            .gallery-grid a {
+                flex: 1 1 calc(33.333% - 3px);
+                max-width: calc(33.333% - 3px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-grid a {
+                flex: 1 1 calc(50% - 3px);
+                max-width: calc(50% - 3px);
+            }
+        }
+
+        /* Style pour une seule image */
+        .single-image {
+            margin: 10px 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .single-image:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        }
+
+        .single-image img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            cursor: zoom-in;
+            transition: all 0.3s ease;
+        }
+
+        .single-image img:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Overlay pour plus d'images */
+        .gallery-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-grid a:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-sections {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>👤 Profil Utilisateur</h2>
+            <a href="/dashboard.html" class="back-btn">← Retour au Dashboard</a>
+        </div>
+        
+        <div id="loading" class="loading">
+            <p>Chargement du profil...</p>
+        </div>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="profileContent" style="display: none;">
+            <!-- Carte de profil principal -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="avatar"></div>
+                    <div class="profile-info">
+                        <h1 id="fullName"></h1>
+                        <div class="username" id="username"></div>
+                        <span id="roleBadge" class="role-badge"></span>
+                    </div>
+                </div>
+                
+                <div class="profile-sections">
+                    <!-- Informations personnelles -->
+                    <div class="section">
+                        <h3>📋 Informations Personnelles</h3>
+                        <div class="field">
+                            <div class="field-label">Email</div>
+                            <div class="field-value" id="email"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Adresse</div>
+                            <div class="field-value" id="adresse"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Téléphone</div>
+                            <div class="field-value" id="telephone"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Date de naissance</div>
+                            <div class="field-value" id="dateNaissance"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Sexe</div>
+                            <div class="field-value" id="sexe"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informations professionnelles -->
+                    <div class="section">
+                        <h3>💼 Informations Professionnelles</h3>
+                        <div class="field">
+                            <div class="field-label">Fonction</div>
+                            <div class="field-value" id="fonction"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Projet</div>
+                            <div class="field-value" id="projet"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Diplôme</div>
+                            <div class="field-value" id="diplome"></div>
+                        </div>
+                        <div class="field">
+                            <div class="field-label">Membre depuis</div>
+                            <div class="field-value" id="createdAt"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section des idées -->
+            <div class="ideas-section">
+                <h3>💡 Idées publiées</h3>
+                <div id="ideasContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Récupérer l'ID utilisateur depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('id');
+        
+        if (!userId) {
+            showError('ID utilisateur manquant dans l\'URL');
+        } else {
+            loadUserProfile(userId);
+        }
+        
+        async function loadUserProfile(userId) {
+            try {
+                // Charger le profil utilisateur
+                const profileResponse = await fetch(`/api/user/${userId}`);
+                if (!profileResponse.ok) {
+                    throw new Error('Utilisateur non trouvé');
+                }
+                const user = await profileResponse.json();
+                
+                // Charger les idées de l'utilisateur
+                const ideasResponse = await fetch(`/api/user/${userId}/ideas`);
+                const ideas = await ideasResponse.json();
+                
+                displayProfile(user, ideas);
+                
+            } catch (error) {
+                showError('Erreur lors du chargement du profil: ' + error.message);
+            }
+        }
+        
+        function displayProfile(user, ideas) {
+            // Masquer le loading
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'block';
+            
+            // Avatar avec initiales
+            const initials = user.nom ? user.nom.split(' ').map(n => n[0]).join('').toUpperCase() : user.username[0].toUpperCase();
+            document.getElementById('avatar').textContent = initials;
+            
+            // Informations principales
+            document.getElementById('fullName').textContent = user.nom || user.username;
+            document.getElementById('username').textContent = '@' + user.username;
+            
+            // Badge de rôle
+            const roleBadge = document.getElementById('roleBadge');
+            if (user.is_admin) {
+                roleBadge.textContent = 'Administrateur';
+                roleBadge.className = 'role-badge role-admin';
+            } else {
+                roleBadge.textContent = 'Utilisateur';
+                roleBadge.className = 'role-badge role-user';
+            }
+            
+            // Informations personnelles
+            document.getElementById('email').textContent = user.email || 'Non renseigné';
+            document.getElementById('adresse').textContent = user.adresse || 'Non renseignée';
+            document.getElementById('telephone').textContent = user.telephone || 'Non renseigné';
+            document.getElementById('dateNaissance').textContent = user.date_naissance ? new Date(user.date_naissance).toLocaleDateString() : 'Non renseignée';
+            document.getElementById('sexe').textContent = user.sexe || 'Non renseigné';
+            
+            // Informations professionnelles
+            document.getElementById('fonction').textContent = user.fonction || 'Non renseignée';
+            document.getElementById('projet').textContent = user.projet || 'Non renseigné';
+            document.getElementById('diplome').textContent = user.diplome || 'Non renseigné';
+            document.getElementById('createdAt').textContent = new Date(user.created_at).toLocaleDateString();
+            
+            // Afficher les idées
+            displayIdeas(ideas);
+        }
+        
+        function displayIdeas(ideas) {
+            const container = document.getElementById('ideasContainer');
+            
+            if (ideas.length === 0) {
+                container.innerHTML = '<p style="color: #6c757d; text-align: center; padding: 20px;">Aucune idée publiée</p>';
+                return;
+            }
+            
+            container.innerHTML = ideas.map(idea => `
+                <div class="idea-card">
+                    <div class="idea-title">${idea.title}</div>
+                    ${idea.description ? `<div class="idea-description">${idea.description}</div>` : ''}
+                    ${createImageGallery(idea.images, idea.id)}
+                    ${idea.filename ? `<a href="/api/files/${idea.filename}" target="_blank" class="file-link">📎 ${idea.original_filename || 'Fichier joint'}</a>` : ''}
+                    <div class="idea-meta">Publié le ${new Date(idea.created_at).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+        
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+        }
+
+        // Fonction pour créer une grille d'images moderne avec GLightbox
+        function createImageGallery(images, ideaId) {
+            if (!images || images.length === 0) {
+                return '';
+            }
+
+            // Groupe unique pour chaque idée pour navigation GLightbox
+            const galleryGroup = `profile-idea-${ideaId}`;
+
+            if (images.length === 1) {
+                // Une seule image, affichage simple avec GLightbox
+                return `
+                    <div class="single-image">
+                        <a href="/api/files/${images[0].filename}"
+                           class="glightbox"
+                           data-gallery="${galleryGroup}"
+                           data-title="${images[0].original_filename || 'Image'}">
+                            <img src="/api/files/${images[0].filename}"
+                                 alt="${images[0].original_filename || 'Image'}"
+                                 loading="lazy">
+                        </a>
+                    </div>
+                `;
+            }
+
+            // Plusieurs images, grille avec GLightbox
+            const maxVisible = 5; // Maximum 5 images visibles
+            const visibleImages = images.slice(0, maxVisible);
+            const remainingCount = images.length - maxVisible;
+
+            return `
+                <div class="gallery-grid">
+                    ${images.map((image, index) => {
+                        const isVisible = index < maxVisible;
+                        const isLast = index === maxVisible - 1 && remainingCount > 0;
+
+                        return `
+                            <a href="/api/files/${image.filename}"
+                               class="glightbox"
+                               data-gallery="${galleryGroup}"
+                               data-title="${image.original_filename || `Image ${index + 1}`}"
+                               ${!isVisible ? 'style="display: none;"' : ''}>
+                                ${isVisible ? `
+                                    <img src="/api/files/${image.filename}"
+                                         alt="${image.original_filename || `Image ${index + 1}`}"
+                                         loading="lazy">
+                                    ${isLast ? `<div class="gallery-overlay">+${remainingCount}</div>` : ''}
+                                ` : ''}
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+    </script>
+
+    <!-- GLightbox JS pour UX moderne -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script>
+        // Initialisation GLightbox pour profils avec configuration française
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                if (typeof GLightbox !== 'undefined') {
+                    const lightbox = GLightbox({
+                        // Navigation et contrôles
+                        touchNavigation: true,
+                        loop: true,
+                        closeButton: true,
+                        keyboardNavigation: true,
+
+                        // Animations et performance
+                        openEffect: 'zoom',
+                        closeEffect: 'zoom',
+                        slideEffect: 'slide',
+                        moreText: 'Voir plus',
+                        moreLength: 60,
+
+                        // Responsive et mobile
+                        dragToleranceX: 40,
+                        dragToleranceY: 65,
+
+                        // Styles et apparence
+                        skin: 'clean',
+
+                        // Callbacks pour debug
+                        onOpen: () => {
+                            console.log('🖼️ GLightbox profil ouvert');
+                        },
+                        onClose: () => {
+                            console.log('❌ GLightbox profil fermé');
+                        }
+                    });
+                    console.log('✅ GLightbox initialisé pour profil avec configuration française');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

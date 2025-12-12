@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration - Types de Publications</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
+        
+        .header {
+            background: #343a40;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: #495057;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 3fr 1fr;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .type-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .type-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .type-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .type-emoji {
+            font-size: 1.5rem;
+        }
+        
+        .type-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #495057;
+            text-transform: capitalize;
+        }
+        
+        .type-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .type-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏷️ Administration - Types de Publications</h1>
+        <nav class="nav-links">
+            <a href="/dashboard.html">📋 Dashboard</a>
+            <a href="/admin-projects.html">📌 Projets</a>
+            <a href="/admin-types.html" class="active">🏷️ Types</a>
+            <a href="/admin-users.html">👥 Utilisateurs</a>
+        </nav>
+    </div>
+
+    <div class="container">
+        <div id="alertContainer"></div>
+        
+        <!-- Formulaire d'ajout de type -->
+        <div class="admin-section">
+            <h2>🏷️ Ajouter un nouveau type de publication</h2>
+            <form id="typeForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Nom du type *</label>
+                        <input type="text" id="name" name="name" required placeholder="ex: finance, production">
+                    </div>
+                    <div class="form-group">
+                        <label for="emoji">Emoji</label>
+                        <input type="text" id="emoji" name="emoji" placeholder="📝" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="color">Couleur</label>
+                        <input type="color" id="color" name="color" value="#6c757d">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" name="description" placeholder="Description du type">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Liste des types -->
+        <div class="admin-section">
+            <h2>📋 Types de publications existants</h2>
+            <div id="loadingTypes" class="loading">Chargement des types...</div>
+            <div id="typesContainer" class="types-grid" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let types = [];
+
+        // Vérifier l'authentification et les droits admin
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/check');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    if (!currentUser.isAdmin) {
+                        window.location.href = '/dashboard.html';
+                        return;
+                    }
+                } else {
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Erreur vérification auth:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        // Afficher une alerte
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Charger les types
+        async function loadTypes() {
+            try {
+                const response = await fetch('/api/admin/types');
+                if (response.ok) {
+                    types = await response.json();
+                    displayTypes();
+                } else {
+                    showAlert('Erreur lors du chargement des types', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('Erreur de connexion', 'error');
+            } finally {
+                document.getElementById('loadingTypes').style.display = 'none';
+                document.getElementById('typesContainer').style.display = 'grid';
+            }
+        }
+
+        // Afficher les types
+        function displayTypes() {
+            const container = document.getElementById('typesContainer');
+            
+            if (types.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #6c757d; grid-column: 1/-1;">Aucun type trouvé</p>';
+                return;
+            }
+
+            container.innerHTML = types.map(type => `
+                <div class="type-card">
+                    <div class="type-header">
+                        <span class="type-emoji">${type.emoji}</span>
+                        <span class="type-name">${type.name}</span>
+                        <span class="type-badge" style="background-color: ${type.color};">
+                            ${type.name.toUpperCase()}
+                        </span>
+                    </div>
+                    <p style="color: #6c757d; margin-bottom: 1rem; font-size: 0.9em;">
+                        ${type.description || 'Aucune description'}
+                    </p>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <span style="font-size: 0.8em; color: #6c757d;">Couleur:</span>
+                        <div class="color-preview" style="background-color: ${type.color};"></div>
+                        <span style="font-size: 0.8em; color: #6c757d;">${type.color}</span>
+                    </div>
+                    <div style="font-size: 0.8em; color: #6c757d; margin-bottom: 1rem;">
+                        Créé le ${new Date(type.created_at).toLocaleDateString('fr-FR')}
+                    </div>
+                    <div class="type-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteType(${type.id}, '${type.name}')">
+                            🗑️ Supprimer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Ajouter un type
+        document.getElementById('typeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const typeData = {
+                name: formData.get('name').toLowerCase().trim(),
+                emoji: formData.get('emoji') || '📝',
+                color: formData.get('color'),
+                description: formData.get('description')
+            };
+
+            try {
+                const response = await fetch('/api/admin/types', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(typeData)
+                });
+
+                if (response.ok) {
+                    showAlert('Type ajouté avec succès');
+                    e.target.reset();
+                    document.getElementById('color').value = '#6c757d';
+                    loadTypes();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Erreur lors de l\'ajout', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('Erreur de connexion', 'error');
+            }
+        });
+
+        // Supprimer un type
+        async function deleteType(typeId, typeName) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le type "${typeName}" ?\n\nAttention: Cette action est irréversible et peut affecter les publications existantes.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/types/${typeId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showAlert('Type supprimé avec succès');
+                    loadTypes();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.error || 'Erreur lors de la suppression', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showAlert('Erreur de connexion', 'error');
+            }
+        }
+
+        // Initialisation
+        checkAuth().then(() => {
+            loadTypes();
+        });
+    </script>
+</body>
+</html>
