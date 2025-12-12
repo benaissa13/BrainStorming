@@ -1060,3 +1060,13 @@ app.put('/api/admin/users/:id/admin', isAdmin, (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Serveur brainstorming démarré sur http://localhost:${PORT}`);
 });
+
+
+
+
+
+
+const a = 5
+if(a = 10) {
+  console.log("bug !");
+}
