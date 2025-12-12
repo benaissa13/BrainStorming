@@ -28,6 +28,17 @@ const storage = multer.diskStorage({
   }
 });
 
+
+
+
+const a = 5
+if(a = 10) {
+  console.log("bug !");
+}
+
+
+
+
 // Types de fichiers autorisés
 const allowedMimeTypes = [
   'image/jpeg', 'image/png', 'image/gif', 'image/webp',
@@ -1060,3 +1071,11 @@ app.put('/api/admin/users/:id/admin', isAdmin, (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Serveur brainstorming démarré sur http://localhost:${PORT}`);
 });
+
+
+
+
+const a = 5
+if(a = 10) {
+  console.log("bug !");
+}
